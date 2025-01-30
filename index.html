@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>حاسبة أسعار بوابات رولينج شتر</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #2a5a8d;
+            --secondary-color: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: #f4f6f9;
+        }
+        
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: #25D366;
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .material-description {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .notes {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body class="py-5">
+    <a id="whatsappBtn" class="whatsapp-btn" target="_blank">
+        <i class="fab fa-whatsapp fa-2x"></i>
+    </a>
+
+    <div class="container">
+        <h1 class="text-center mb-4">
+            <i class="fas fa-calculator me-2"></i>
+            حاسبة أسعار بوابات رولينج شتر
+        </h1>
+
+        <!-- بيانات العميل -->
+        <div class="main-card">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" placeholder="اسم العميل" id="customerName">
+                </div>
+                <div class="col-md-4">
+                    <input type="tel" class="form-control" placeholder="رقم الهاتف" id="phone">
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" id="governorate" onchange="loadWilayah()">
+                        <option value="">اختر المحافظة</option>
+                        <option value="الداخلية">الداخلية</option>
+                        <option value="مسقط">مسقط</option>
+                        <option value="جنوب الباطنة">جنوب الباطنة</option>
+                        <option value="شمال الشرقية">شمال الشرقية</option>
+                        <option value="الظاهرة">الظاهرة</option>
+                    </select>
+                </div>
+                <div class="col-12">
+                    <select class="form-select" id="wilayah" disabled>
+                        <option value="">اختر الولاية</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- بيانات القياس -->
+        <div class="main-card">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <input type="number" class="form-control" placeholder="العرض (سم)" id="width">
+                </div>
+                <div class="col-md-6">
+                    <input type="number" class="form-control" placeholder="الارتفاع (سم)" id="height">
+                </div>
+                <div class="col-12">
+                    <select class="form-select" id="slideType" onchange="showDescription()">
+                        <option value="15">الإيراني الأبيض Grade C</option>
+                        <option value="17.5">التركي الأبيض Grade B</option>
+                        <option value="21">التركي الرمادي Grade B</option>
+                        <option value="21">التركي الأسود Grade B</option>
+                        <option value="25">التركي الخشبي Grade B</option>
+                        <option value="21">التركي الأبيض Grade A</option>
+                        <option value="21">التركي الحليبي Grade A</option>
+                        <option value="20.625">العماني الأبيض 1.1ملم</option>
+                        <option value="18.875">العماني الملون 1.1ملم</option>
+                        <option value="26.625">العماني الأبيض 1.5ملم</option>
+                        <option value="24.25">العماني الملون 1.5ملم</option>
+                    </select>
+                </div>
+                <div id="materialDescription" class="material-description"></div>
+            </div>
+        </div>
+
+        <!-- النتائج -->
+        <div class="main-card">
+            <div class="text-center">
+                <button class="btn btn-primary btn-lg w-100" onclick="calculatePrice()">
+                    <i class="fas fa-calculator me-2"></i>احتساب التكلفة
+                </button>
+            </div>
+            
+            <div id="results" class="mt-4">
+                <h3 class="text-primary">
+                    التكلفة الإجمالية: 
+                    <span id="totalPrice">0.000</span> ريال عماني
+                </h3>
+                <div class="notes">
+                    * تشمل تكلفة التركيب والمواد الأساسية<br>
+                    ** قد تختلف التكلفة حسب الإضافات المطلوبة
+                </div>
+            </div>
+        </div>
+
+        <!-- الملاحظات -->
+        <div class="main-card notes">
+            <h5>ملاحظات هامة:</h5>
+            <ul>
+                <li>تشمل التكلفة: الشرائح، القنوات، المحرك الأساسي، جهاز التحكم</li>
+                <li>الإضافات الاختيارية: ألوان خاصة (+60 ريال)، تحكم عن بعد إضافي</li>
+                <li>الضمان يشمل عيوب التصنيع لمدة 5 سنوات</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const installationPrices = {
+            'الداخلية': {
+                'نزوى': 60, 'بهلاء': 80, 'الحمراء': 80, 'أدم': 80,
+                'إزكي': 70, 'منح': 70, 'سمائل': 80, 'بدبد': 90, 'الجبل الأخضر': 100
+            },
+            'مسقط': {
+                'مسقط': 100, 'السيب': 90, 'بوشر': 90, 'مطرح': 100, 'العامرات': 90
+            },
+            'جنوب الباطنة': {
+                'المصنعة': 100, 'بركاء': 90
+            },
+            'شمال الشرقية': {
+                'إبراء': 100, 'المضيبي': 100, 'دماء والطائيين': 100
+            },
+            'الظاهرة': {
+                'عبري': 100
+            }
+        };
+
+        const materialDescriptions = {
+            "الإيراني الأبيض Grade C": `
+                شريحة الومنيوم مزدوج الطبقات ب 3 جسور صناعة ايرانية
+                وزن المتر المربع 4 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة المصنع
+            `,
+            "التركي الأبيض Grade B": `
+                شريحة الومنيوم مزدوج الطبقات ب 3 جسور صناعة تركية
+                وزن المتر المربع 5.56 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة المصنع
+            `,
+            "التركي الرمادي Grade B": `
+                شريحة الومنيوم مزدوج الطبقات ب 3 جسور صناعة تركية
+                وزن المتر المربع 5.3 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة المصنع
+            `,
+            "التركي الأسود Grade B": `
+                شريحة الومنيوم مزدوج الطبقات ب 3 جسور صناعة تركية
+                وزن المتر المربع 4.7 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة المصنع
+            `,
+            "التركي الخشبي Grade B": `
+                شريحة الومنيوم مزدوج الطبقات ب 3 جسور صناعة تركية
+                وزن المتر المربع 5.3 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة المصنع
+            `,
+            "التركي الأبيض Grade A": `
+                شريحة الومنيوم مزدوج الطبقات بجسر واحد صناعة تركية
+                وزن المتر المربع 6.125 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة المصنع
+            `,
+            "التركي الحليبي Grade A": `
+                شريحة الومنيوم مزدوج الطبقات بجسر واحد صناعة تركية
+                وزن المتر المربع 6.125 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة المصنع
+            `,
+            "العماني الأبيض 1.1ملم": `
+                شريحة الومنيوم مزدوج الطبقات صناعة NAPCO
+                وزن المتر المربع 8.37 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة مصنع NAPCO
+            `,
+            "العماني الملون 1.1ملم": `
+                شريحة الومنيوم مزدوج الطبقات صناعة NAPCO
+                وزن المتر المربع 8.37 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغ فرن حراري
+            `,
+            "العماني الأبيض 1.5ملم": `
+                شريحة الومنيوم مزدوج الطبقات صناعة NAPCO
+                وزن المتر المربع 10.18 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغة مصنع NAPCO
+            `,
+            "العماني الملون 1.5ملم": `
+                شريحة الومنيوم مزدوج الطبقات صناعة NAPCO
+                وزن المتر المربع 10.18 كجم .
+                ضمان 5 سنوات ضد التآكل و الصدأ
+                صبغ فرن حراري
+            `
+        };
+
+        function loadWilayah() {
+            const gov = document.getElementById('governorate').value;
+            const wilayahSelect = document.getElementById('wilayah');
+            wilayahSelect.innerHTML = '<option value="">اختر الولاية</option>';
+            wilayahSelect.disabled = !gov;
+            if (gov) {
+                Object.keys(installationPrices[gov]).forEach(wilayah => {
+                    wilayahSelect.innerHTML += `<option value="${wilayah}">${wilayah}</option>`;
+                });
+            }
+        }
+
+        function calculatePrice() {
+            // الحصول على القيم الأساسية
+            const originalWidth = parseFloat(document.getElementById('width').value) || 0;
+            const originalHeight = parseFloat(document.getElementById('height').value) || 0;
+            const selectedType = document.getElementById('slideType').selectedOptions[0].text;
+
+            // إضافة المقاسات الإضافية
+            let widthAddition = 15; // إضافة أساسية لجميع الأنواع
+            if (selectedType.includes('العماني')) {
+                widthAddition += 25; // إضافة 25 سم إضافية للأنواع العمانية
+            }
+            
+            const totalWidth = (originalWidth + widthAddition) / 100; // تحويل إلى متر
+            const totalHeight = (originalHeight + 60) / 100; // تحويل إلى متر
+
+            // حساب المساحة
+            const area = totalWidth * totalHeight;
+
+            // الحصول على سعر المادة
+            const materialPrice = parseFloat(document.getElementById('slideType').value);
+            
+            // تكاليف إضافية
+            let extraCost = 0;
+            if (selectedType.includes('العماني الملون 1.1ملم')) extraCost += 60;
+            if (selectedType.includes('العماني الملون 1.5ملم')) extraCost += 70;
+
+            // تكلفة التركيب
+            const wilayah = document.getElementById('wilayah').value;
+            const installationCost = installationPrices[document.getElementById('governorate').value]?.[wilayah] || 0;
+            
+            // السعر النهائي
+            const totalPrice = (area * materialPrice) + 100 + installationCost + extraCost;
+            document.getElementById('totalPrice').textContent = totalPrice.toFixed(3);
+            
+            // إعداد رسالة الواتساب
+            prepareWhatsappMessage();
+        }
+
+        function prepareWhatsappMessage() {
+            const customerName = document.getElementById('customerName').value;
+            const phone = document.getElementById('phone').value;
+            const gov = document.getElementById('governorate').value;
+            const wilayah = document.getElementById('wilayah').value;
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value;
+            const material = document.getElementById('slideType').selectedOptions[0].text;
+            const totalPrice = document.getElementById('totalPrice').textContent;
+
+            const message = `السلام عليكم ورحمة الله وبركاته
+
+تفاصيل طلب بوابة رولينج شتر:
+
+👤 بيانات العميل:
+- الاسم: ${customerName}
+- رقم الهاتف: ${phone}
+- الموقع: ${gov} - ${wilayah}
+
+📏 المقاسات:
+- العرض: ${width} سم
+- الارتفاع: ${height} سم
+
+🛠️ المواصفات الفنية:
+- نوع الشرائح: ${material}
+- التكلفة الإجمالية: ${totalPrice} ريال عماني
+
+يرجى التواصل لتأكيد الطلب أو لطلب أي تعديلات إضافية.
+
+مع الشكر،
+فريق عمل بوابات رولينج شتر`;
+
+            const encodedMessage = encodeURIComponent(message);
+            document.getElementById('whatsappBtn').href = `https://wa.me/96890660002?text=${encodedMessage}`;
+        }
+
+        function showDescription() {
+            const selected = document.getElementById('slideType').selectedOptions[0].text;
+            document.getElementById('materialDescription').innerHTML = materialDescriptions[selected];
+        }
+
+        // التحميل الأولي
+        document.addEventListener('DOMContentLoaded', () => {
+            loadWilayah();
+            showDescription();
+        });
+    </script>
+</body>
+</html>
